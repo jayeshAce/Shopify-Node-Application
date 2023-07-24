@@ -1,0 +1,152 @@
+To call Shop API
+
+const shop_api = await client.get({
+    path: 'shop'
+});
+var storeid = shop_api.body.shop.id;    
+
+===========================================================
+
+To call Product API
+
+app.get('/fetch_all_products', async (http_request, http_response) => {
+    const client_session = await Shopify.Utils.loadCurrentSession(http_request, http_response);
+    const client = new Shopify.Clients.Rest(client_session.shop, client_session.accessToken);
+    const shop_api = await client.get({
+        path: 'shop'
+    });
+    var storeid = shop_api.body.shop.id;    
+    var page_info = http_request.query.next_page_url;
+    
+    if(page_info.length == '2')
+    {
+        const products = await client.get({
+            path: 'products',
+            query: {limit:250},
+        });
+        const next_page_url = products.pageInfo.nextPage.query.page_info; 
+        products.body.products.forEach((element) => {
+            var product_id = element.id;
+            var product_name = element.title;
+            var product_handle = element.handle;
+            var domain = client_session.shop;
+        });
+        http_response.redirect('/fetch_all_products?next_page_url='+next_page_url);
+        console.log(next_page_url);
+          
+    }
+    else
+    {   
+        const products = await client.get({
+            path: 'products',
+            query: {limit:250,page_info: http_request.query.next_page_url},
+        });
+        if(isset(products.pageInfo.nextPage) == true)
+        {
+            const next_page_url = products.pageInfo.nextPage.query.page_info;
+            products.body.products.forEach((element) => {
+            var product_id = element.id;
+            var product_name = element.title;
+            var product_handle = element.handle;
+            var domain = client_session.shop;
+            });
+            console.log(next_page_url);
+            http_response.redirect('/fetch_all_products?next_page_url='+next_page_url);
+        }
+        else
+        {
+            http_response.end("Done");
+        }
+    }
+});
+
+function isset (ref) { return typeof ref !== 'undefined' } 
+
+
+===========================================================
+
+To Add New product
+
+app.get('/products/add', async (http_request, http_response) => {
+    const client_session = await Shopify.Utils.loadCurrentSession(http_request, http_response);
+    const client = new Shopify.Clients.Rest(client_session.shop, client_session.accessToken);
+    const payload = {
+        product: {
+            title: "T-shirt with witty saying " + randomInt(1, 500),
+            vendor: "Best T-shirts Evah",
+            product_type: "Clothing",
+            tags: ["T-shirt", "Funny", "Geeky"],
+            body_html: "<strong>Binary jokes</strong>",
+            published: false
+        }
+    };
+    await client.post({
+        path: 'products',
+        data: payload,
+        type: DataType.JSON
+    });
+    http_response.redirect('/fetch_all_products');
+});
+
+===========================================================
+
+Fetch Custom and Smart Collections  and Collection Products
+
+app.get('/get_custom_collection', async (http_request, http_response) => {
+    const client_session = await Shopify.Utils.loadCurrentSession(http_request, http_response);
+    const client = new Shopify.Clients.Rest(client_session.shop, client_session.accessToken);
+    const custom_collections = await client.get({
+        path: 'custom_collections',
+        query: {limit:250},
+    });
+
+    custom_collections.body.custom_collections.forEach((element) => {
+        var collection_id = element.id;
+        console.log(collection_id);
+    });
+});
+
+app.get('/get_smart_collections', async (http_request, http_response) => {
+    const client_session = await Shopify.Utils.loadCurrentSession(http_request, http_response);
+    const client = new Shopify.Clients.Rest(client_session.shop, client_session.accessToken);
+    const smart_collections = await client.get({
+        path: 'smart_collections',
+        query: {limit:250},
+    });
+    smart_collections.body.smart_collections.forEach((element) => {
+        var collection_id = element.id;
+        console.log(collection_id);
+    });
+});
+
+app.get('/collection_products', async (http_request, http_response) => {
+    const client_session = await Shopify.Utils.loadCurrentSession(http_request, http_response);
+    const client = new Shopify.Clients.Rest(client_session.shop, client_session.accessToken);
+    var headers = {
+        'X-Shopify-Access-Token': client_session.accessToken
+    };
+    var options = {
+        url: 'https://'+client_session.shop+'/admin/api/2022-10/collections/273831329851/products.json',
+        headers: headers
+    };
+    function callback(error, response, body) {
+        if (!error && response.statusCode == 200) {
+            console.log(body);
+        }
+    }
+    request(options, callback);
+ });
+
+===========================================================
+
+To call Inventory API
+To call Product Update/Delete API
+To call Product Image API
+To call Inventory API
+To call Charge API
+
+===============================================================
+
+
+
+

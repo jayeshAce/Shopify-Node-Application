@@ -115,12 +115,11 @@ app.get('/save_to_db', async (http_request, http_response) => {
 });
 
 app.get('/dashboard', async (http_request, http_response) => {
-    let sqlQuery = "SELECT * FROM shop_info";
-    console.log(sqlQuery);
-    let query = dbConn.query(sqlQuery, (err, results) => {
+    
+    var query = dbConn.query("SELECT * FROM shop_info", (err, results) => {
         console.log(results);
+        http_response.render('dashboard.ejs', { 'teamData' : results });
     });
-    http_response.render('dashboard');
 });
 
 const httpServer = http.createServer(app);

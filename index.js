@@ -116,8 +116,9 @@ app.get('/save_to_db', async (http_request, http_response) => {
 
 app.get('/dashboard', async (http_request, http_response) => {
     let sqlQuery = "SELECT * FROM shop_info";
+    console.log(sqlQuery);
     let query = dbConn.query(sqlQuery, (err, results) => {
-    console.log(results);
+        console.log(results);
     });
     http_response.render('dashboard');
 });

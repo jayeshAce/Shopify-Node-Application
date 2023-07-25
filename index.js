@@ -1,7 +1,6 @@
 /* Basic Requirements */
 
 const express = require('express');
-const app = express();
 const fs = require('fs');
 const Shopify = require('@shopify/shopify-api').Shopify;
 const ApiVersion = require('@shopify/shopify-api').ApiVersion;
@@ -10,13 +9,14 @@ const cookieParser = require("cookie-parser");
 const sessions = require('express-session');
 const dbConn = require('./config/database');
 const oneDay = 1000 * 60 * 60 * 24;
-
 require('dotenv').config();
+var mainRouter = require('./routes/main');
+const app = express();
 
+app.use('/main', mainRouter);
 app.set('views', 'views');
 app.set('view engine', 'ejs');
 app.use(cookieParser());
-//test
 app.use(function (req, res, next) {
     res.setHeader("frame-ancestors", "none");
     return next();
@@ -41,14 +41,14 @@ Shopify.Context.initialize({
 });
 const ACTIVE_SHOPIFY_SHOPS = {};
 
-// /* Basic Requirements */
+/* Basic Requirements */
 
 app.get('/', async (http_request, http_response) => {
     session = http_request.session;
-    if (http_request?.query?.shop == undefined) {
-        var shop = http_request?.cookies?.shop;
+    if (http_request.query.shop == undefined) {
+        var shop = http_request.cookies.shop;
     } else {
-        var shop = http_request?.query.shop;
+        var shop = http_request.query.shop;
     }
     session.appshop = shop;
     http_response.redirect('/auth/shopify');
@@ -66,7 +66,6 @@ app.get('/auth/shopify', async (http_request, http_response) => {
     );
     return http_response.redirect(authorizedRoute);
 });
-
 app.get('/auth/shopify/callback', async (http_request, http_response) => {
     var session_shop = http_request.session;
     var shop = session_shop.appshop;
@@ -82,7 +81,9 @@ app.get('/auth/shopify/callback', async (http_request, http_response) => {
     http_response.redirect('/save_to_db');
 });
 
+
 app.get('/save_to_db', async (http_request, http_response) => {
+    console.log("heree")
     var session_shop = http_request.session;
     const client_session = await Shopify.Utils.loadCurrentSession(http_request, http_response);
     var storename = domain = shop = client_session.shop;
@@ -110,8 +111,8 @@ app.get('/dashboard', async (http_request, http_response) => {
     
     var query = dbConn.query("SELECT * FROM shop_info", (err, results) => {
         console.log(results);
-        http_response.send("Success")
-        http_response.render('dashboard.ejs', { 'teamData' : results });
+        // http_response.send("Successs")
+        http_response.render('dashboard.ejs', {data : results });
     });
 });
 

@@ -11,5 +11,6 @@ if (err)
     console.error('Error connecting Db : ' + err.stack);
     return;
 }
+console.log("Database connect success")
 });
 module.exports = connection;

@@ -1,1 +1,1 @@
-# basic
+# Shopify-Node-Application

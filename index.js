@@ -2,29 +2,21 @@
 
 const express = require('express');
 const app = express();
-const http = require('http');
-const https = require('https');
 const fs = require('fs');
-const { randomInt } = require("crypto");
-const { DataType } = require("@shopify/shopify-api");
 const Shopify = require('@shopify/shopify-api').Shopify;
 const ApiVersion = require('@shopify/shopify-api').ApiVersion;
-const bodyParser = require('body-parser');
-const request=require('request');
 const cookieParser = require("cookie-parser");
+
 const sessions = require('express-session');
 const dbConn = require('./config/database');
-const fetch = require('node-fetch');
-const { reset } = require('nodemon');
 const oneDay = 1000 * 60 * 60 * 24;
 
 require('dotenv').config();
 
 app.set('views', 'views');
 app.set('view engine', 'ejs');
-app.use(bodyParser.urlencoded({ extended: true }))
-app.use(bodyParser.json())
 app.use(cookieParser());
+
 app.use(function (req, res, next) {
     res.setHeader("frame-ancestors", "none");
     return next();
@@ -49,14 +41,14 @@ Shopify.Context.initialize({
 });
 const ACTIVE_SHOPIFY_SHOPS = {};
 
-/* Basic Requirements */
+// /* Basic Requirements */
 
 app.get('/', async (http_request, http_response) => {
     session = http_request.session;
-    if (http_request.query.shop == undefined) {
-        var shop = http_request.cookies.shop;
+    if (http_request?.query?.shop == undefined) {
+        var shop = http_request?.cookies?.shop;
     } else {
-        var shop = http_request.query.shop;
+        var shop = http_request?.query.shop;
     }
     session.appshop = shop;
     http_response.redirect('/auth/shopify');
@@ -118,9 +110,9 @@ app.get('/dashboard', async (http_request, http_response) => {
     
     var query = dbConn.query("SELECT * FROM shop_info", (err, results) => {
         console.log(results);
+        http_response.send("Success")
         http_response.render('dashboard.ejs', { 'teamData' : results });
     });
 });
 
-const httpServer = http.createServer(app);
-httpServer.listen(3000, () => console.log('Application is listening on port 3000.'));
+app.listen(3000, () => console.log('Application is listening on port 3000.'));

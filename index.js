@@ -16,7 +16,7 @@ require('dotenv').config();
 app.set('views', 'views');
 app.set('view engine', 'ejs');
 app.use(cookieParser());
-
+//test
 app.use(function (req, res, next) {
     res.setHeader("frame-ancestors", "none");
     return next();

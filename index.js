@@ -43,77 +43,80 @@ const ACTIVE_SHOPIFY_SHOPS = {};
 
 /* Basic Requirements */
 
-app.get('/', async (http_request, http_response) => {
-    session = http_request.session;
-    if (http_request.query.shop == undefined) {
-        var shop = http_request.cookies.shop;
-    } else {
-        var shop = http_request.query.shop;
-    }
-    session.appshop = shop;
-    http_response.redirect('/auth/shopify');
-});
+// app.get('/', async (http_request, http_response) => {
+//     session = http_request.session;
+//     if (http_request.query.shop == undefined) {
+//         var shop = http_request.cookies.shop;
+//     } else {
+//         var shop = http_request.query.shop;
+//     }
+//     session.appshop = shop;
+//     http_response.redirect('/auth/shopify');
+// });
 
-app.get('/auth/shopify', async (http_request, http_response) => {
-    var session_shop = http_request.session;
-    var shop = session_shop.appshop;
-    let authorizedRoute = await Shopify.Auth.beginAuth(
-        http_request,
-        http_response,
-        shop,
-        '/auth/shopify/callback',
-        false,
-    );
-    return http_response.redirect(authorizedRoute);
-});
-app.get('/auth/shopify/callback', async (http_request, http_response) => {
-    var session_shop = http_request.session;
-    var shop = session_shop.appshop;
-    try {
-        const client_session = await Shopify.Auth.validateAuthCallback(
-            http_request,
-            http_response,
-            http_request.query);
-        ACTIVE_SHOPIFY_SHOPS[shop] = client_session.scope;
-    } catch (eek) {
-        http_response.send(eek)
-    }
-    http_response.redirect('/save_to_db');
-});
+// app.get('/auth/shopify', async (http_request, http_response) => {
+//     var session_shop = http_request.session;
+//     var shop = session_shop.appshop;
+//     let authorizedRoute = await Shopify.Auth.beginAuth(
+//         http_request,
+//         http_response,
+//         shop,
+//         '/auth/shopify/callback',
+//         false,
+//     );
+//     return http_response.redirect(authorizedRoute);
+// });
+// app.get('/auth/shopify/callback', async (http_request, http_response) => {
+//     var session_shop = http_request.session;
+//     var shop = session_shop.appshop;
+//     try {
+//         const client_session = await Shopify.Auth.validateAuthCallback(
+//             http_request,
+//             http_response,
+//             http_request.query);
+//         ACTIVE_SHOPIFY_SHOPS[shop] = client_session.scope;
+//     } catch (eek) {
+//         http_response.send(eek)
+//     }
+//     http_response.redirect('/save_to_db');
+// });
 
 
-app.get('/save_to_db', async (http_request, http_response) => {
-    console.log("heree")
-    var session_shop = http_request.session;
-    const client_session = await Shopify.Utils.loadCurrentSession(http_request, http_response);
-    var storename = domain = shop = client_session.shop;
-    var access_token = client_session.accessToken;
-    dbConn.query(
-        {
-            sql: 'SELECT * FROM `shop_info` WHERE `domain` = ?',
-            values: [shop]
-        }
-        , (err, rows, fields) => {
-            if(rows == 0){
-                dbConn.query(
-                {
-                    sql: "INSERT INTO shop_info (domain, access_token) VALUES ('"+domain+"', '"+access_token+"')"
-                }
-                , (err, rows, fields) => {
-                    if (err) throw err;
-                })
-            }
-        })
-    http_response.redirect('dashboard');
-});
+// app.get('/save_to_db', async (http_request, http_response) => {
+//     console.log("heree")
+//     var session_shop = http_request.session;
+//     const client_session = await Shopify.Utils.loadCurrentSession(http_request, http_response);
+//     var storename = domain = shop = client_session.shop;
+//     var access_token = client_session.accessToken;
+//     dbConn.query(
+//         {
+//             sql: 'SELECT * FROM `shop_info` WHERE `domain` = ?',
+//             values: [shop]
+//         }
+//         , (err, rows, fields) => {
+//             if(rows == 0){
+//                 dbConn.query(
+//                 {
+//                     sql: "INSERT INTO shop_info (domain, access_token) VALUES ('"+domain+"', '"+access_token+"')"
+//                 }
+//                 , (err, rows, fields) => {
+//                     if (err) throw err;
+//                 })
+//             }
+//         })
+//     http_response.redirect('dashboard');
+// });
 
-app.get('/dashboard', async (http_request, http_response) => {
+// app.get('/dashboard', async (http_request, http_response) => {
     
-    var query = dbConn.query("SELECT * FROM shop_info", (err, results) => {
-        console.log(results);
-        // http_response.send("Successs")
-        http_response.render('dashboard.ejs', {data : results });
-    });
-});
+//     var query = dbConn.query("SELECT * FROM shop_info", (err, results) => {
+//         console.log(results);
+//         // http_response.send("Successs")
+//         http_response.render('dashboard.ejs', {data : results });
+//     });
+// });
+app.get('/', async (http_request, http_response) => {
+    http_response.send("send response success")
+})
 
 app.listen(3000, () => console.log('Application is listening on port 3000.'));

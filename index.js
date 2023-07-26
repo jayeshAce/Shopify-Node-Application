@@ -17,29 +17,29 @@ app.use('/main', mainRouter);
 app.set('views', 'views');
 app.set('view engine', 'ejs');
 app.use(cookieParser());
-app.use(function (req, res, next) {
-    res.setHeader("frame-ancestors", "none");
-    return next();
-});
-app.use(sessions({
-    secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
-    saveUninitialized: true,
-    cookie: { maxAge: oneDay },
-    resave: false
-}));
+// app.use(function (req, res, next) {
+//     res.setHeader("frame-ancestors", "none");
+//     return next();
+// });
+// app.use(sessions({
+//     secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
+//     saveUninitialized: true,
+//     cookie: { maxAge: oneDay },
+//     resave: false
+// }));
 
-var session;
-const { API_KEY, API_SECRET_KEY, SCOPES, HOST, HOST_SCHEME } = process.env;
-Shopify.Context.initialize({
-    API_KEY,
-    API_SECRET_KEY,
-    SCOPES: [SCOPES],
-    HOST_NAME: HOST.replace(/https?:\/\//, ""),
-    HOST_SCHEME,
-    IS_EMBEDDED_APP: false,
-    API_VERSION: ApiVersion.July22
-});
-const ACTIVE_SHOPIFY_SHOPS = {};
+// var session;
+// const { API_KEY, API_SECRET_KEY, SCOPES, HOST, HOST_SCHEME } = process.env;
+// Shopify.Context.initialize({
+//     API_KEY,
+//     API_SECRET_KEY,
+//     SCOPES: [SCOPES],
+//     HOST_NAME: HOST.replace(/https?:\/\//, ""),
+//     HOST_SCHEME,
+//     IS_EMBEDDED_APP: false,
+//     API_VERSION: ApiVersion.July22
+// });
+// const ACTIVE_SHOPIFY_SHOPS = {};
 
 /* Basic Requirements */
 
@@ -118,5 +118,7 @@ const ACTIVE_SHOPIFY_SHOPS = {};
 app.get('/', async (http_request, http_response) => {
     http_response.send("send response success")
 })
-
+app.get('/database', async (http_request, http_response) => {
+    http_response.send("send response database")
+})
 app.listen(3000, () => console.log('Application is listening on port 3000.'));

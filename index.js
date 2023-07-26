@@ -10,10 +10,10 @@ const sessions = require('express-session');
 const dbConn = require('./config/database');
 const oneDay = 1000 * 60 * 60 * 24;
 require('dotenv').config();
-var mainRouter = require('./routes/main');
+// var mainRouter = require('./routes/main');
 const app = express();
 
-app.use('/main', mainRouter);
+// app.use('/main', mainRouter);
 app.set('views', 'views');
 app.set('view engine', 'ejs');
 app.use(cookieParser());
